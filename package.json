@@ -4,9 +4,13 @@
   "description": "",
   "main": "test.js",
   "dependencies": {
-    "@nut-tree/nut-js": "^1.4.1"
+    "@nut-tree/nut-js": "^1.4.1",
+    "clipboardy": "^2.3.0",
+    "robotjs": "^0.6.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "node-key-sender": "^1.0.11"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js"
