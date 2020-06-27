@@ -1,5 +1,7 @@
 const { Button, jestMatchers, mouse, straightTo, centerOf, randomPointIn, Region, right, down, left, up , keyboard, Key, clipboard } = require("@nut-tree/nut-js");
 const { getPixelColor } = require('robotjs');
+const { data: validCurrs } = require('./valid.json');
+
 const ORIGIN_X = 1936;
 const ORIGIN_Y = 612;
 const MAX_COL = 12;
@@ -28,34 +30,41 @@ async function wait(ms) {
 }
 
 function moveMouseProv(x, y) {
-	return mouse.move([{x, y}]);
+	return mouse.setPosition({ x, y });
 }
 
 (async () => {
 	console.log('============ NEW INSTANCE ===========');
 	let currentY = ORIGIN_Y;
-	await keyboard.pressKey(Key.LeftAlt, Key.Tab);
-	await keyboard.pressKey(Key.Enter);
+	console.log(validCurrs);
+	//return;
+	await keyboard.type(Key.LeftAlt, Key.Tab);
 	await clipboard.copy('');
 	await keyboard.pressKey(Key.LeftControl);
-	for (let i = 0; i < 1; i++) {
+	for (let i = 0; i < MAX_ROW; i++) {
 		let currentX = ORIGIN_X;
 		for (let j = 0; j < MAX_COL; j++) {
 			await moveMouseProv(currentX, currentY);
 			const col = await getPixelColor(currentX, currentY);
 			const { r, g, b } = hexToRgb(col);
-			if (r > 8 || g > 8 || b > 8) {
+
+			if (r > 9 || g > 9 || b > 9) {
 				await keyboard.type(Key.C);
 				const text = await clipboard.paste();
-				if (text.includes('Rarity: Currency')) {
-					console.log(text);
+				const [rarity, curName] = text.trim().split(/\r?\n/);
+				//console.log(`|${rarity}|`, `|${curName}|`);
+				if (rarity === 'Rarity: Currency' && validCurrs.some(({ name }) => name === curName)) {
+					await mouse.leftClick();
+					console.log(curName);
 				}
 			}
+
 			currentX += paddingCol;
 		}
 		currentY += paddingRow;
 	}
 
 	await keyboard.releaseKey(Key.LeftControl, Key.C);
+	//fs.writeFile('valid.json', JSON.stringify(validCurrencies), console.log)
 	console.log('done');
 })()
